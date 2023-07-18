@@ -4,25 +4,26 @@
  * 
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FlatList } from "react-native";
 import axios from 'axios';
 import { ScreenContainer } from "../styles";
 import FoodItemListRow from "./FoodItemRow";
-import { BottomBarContainer, BottomBarText } from "./styles";
+import { BottomBarContainer, BottomBarText, MenuFilterContainer, MenuFilterText, FiltersRow } from "./styles";
 import endpoints from "../../constants/endpoints";
 import { useDispatch, useSelector } from "react-redux";
 import * as cartActions from '../../redux/actions/cartActions';
+import { SearchBar } from 'react-native-elements';
+
 
 const MenuScreen = ({navigation}) => {
 
-  const [data, setData] = useState([]);  
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
-  const cartState = useSelector(s => s.cart);
-
-  console.log('cartState: '+JSON.stringify(cartState.cart));
-
+  const cartState = useSelector(s => s.cart);  
+  const [searchTerm, setSearchTerm] = useState(null);
+  const [vegFilterSelected, setVegFilterSelected] = useState(false);
+  
   useEffect(() => {
     const getData = async () => {
       try{
@@ -31,11 +32,8 @@ const MenuScreen = ({navigation}) => {
         if(!result || !result.data){
           setError('Data not found')
           return;
-        }
-        // console.log('items: '+JSON.stringify(result.data.items));
-        setData(result.data.items);
-
-        // update master store
+        }        
+        // setDisplayFoodItems(result.data.items);        
         dispatch(cartActions.updateFoodItemsData(result.data));
       }
       catch(e){
@@ -45,6 +43,17 @@ const MenuScreen = ({navigation}) => {
 
     getData();
   }, []);
+
+  const displayFoodItems = useMemo(() => {       
+    // filter rows
+    return cartState.foodItems
+      .filter(item => searchTerm ? item.name.includes(searchTerm): true)
+      .filter(item => {
+        console.log('item.item_type: '+item.item_type);
+        return (vegFilterSelected ? (item.item_type === 'veg'): true) ;       
+      });
+
+  }, [cartState.foodItems, searchTerm, vegFilterSelected]);
 
   const goToCart = () => {
     // Check if any items are selected 
@@ -68,7 +77,7 @@ const MenuScreen = ({navigation}) => {
   const renderFoodItemsList = () => {
     return (
       <FlatList
-        data={data}
+        data={displayFoodItems}
         renderItem={({item}) => <FoodItemListRow 
             item={item} 
             cartState={cartState}
@@ -90,11 +99,32 @@ const MenuScreen = ({navigation}) => {
   }
 
   const renderFilters = () => {
-    return null
+    return (
+      <FiltersRow>
+        <MenuFilterContainer selected={vegFilterSelected} onPress={() => setVegFilterSelected(!vegFilterSelected)}>
+            <MenuFilterText selected={vegFilterSelected}>Veg</MenuFilterText>
+        </MenuFilterContainer>
+      </FiltersRow>
+    )
+  }
+
+  const renderSearchBar = () => {
+    if(!cartState.cart || cartState.cart.length === 0){
+      return null;
+    }
+    return (
+      <SearchBar
+        placeholder="Search here ..."
+        onChangeText={(search) => setSearchTerm(search)}
+        value={searchTerm}
+        lightTheme
+      />
+    )
   }
 
   return (
-    <ScreenContainer>            
+    <ScreenContainer>  
+      {renderSearchBar()}          
       {renderFilters()}
       {renderFoodItemsList()}
       {renderBottomBar()}

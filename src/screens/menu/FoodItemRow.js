@@ -17,11 +17,7 @@ import {
 
 const FoodItemListRow = props => {  
   const {item, cartState, onItemAddToCart, onRemoveItemFromCart} = props; 
-
-
   const isPartOfCart = !!Object.keys(cartState.cart).find(c => c == item.id && cartState.cart[c] > 0) ;
-  console.log('FoodItemListRow: id'+item.id+" isAdded: "+isPartOfCart);
-
   return (        
       <FoodItemRowContainer>    
         <FoodItemLeftContainer>
@@ -30,7 +26,7 @@ const FoodItemListRow = props => {
         <FoodItemMiddleContainer>
           <FoodItemMiddleTopContainer>
             <FoodItemName>{item.name}</FoodItemName>   
-            <VegNonVegIcon source={require('../../images/veg_icon.png')}/>                   
+            <VegNonVegIcon source={item.item_type === 'veg' ? require('../../images/veg_icon.png'): require('../../images/non_veg_icon.png')}/>                   
           </FoodItemMiddleTopContainer>
           <FoodItemPrice>INR {item.price}</FoodItemPrice>    
           <FoodItemDesc numberOfLines={2} ellipsizeMode='tail'>{item.description}</FoodItemDesc>        

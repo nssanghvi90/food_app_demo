@@ -95,3 +95,26 @@ export const BottomBarContainer = styled.TouchableHighlight`
 export const BottomBarText = styled(BaseText)`
   color: #FFFFFF;
 `;
+
+export const FiltersRow = styled.View`
+  margin: 20px;
+  flexDirection: row;
+  justifyContent: flex-start;
+  alignItems: center;
+`;
+
+export const MenuFilterContainer = styled.TouchableOpacity`
+  backgroundColor: ${props => props.selected ? '#228b22' : '#FFFFFF'};
+  justifyContent: center;
+  alignItems: center;
+  paddingVertical: 15px;
+  borderRadius: 8px;
+  paddingHorizontal: 20px;
+  paddingVertical: 8px;
+  borderWidth: 1px;
+  borderColor: ${props => props.selected ? '#228b22' : '#000000'};
+`;
+
+export const MenuFilterText = styled(BaseText)`
+  color: ${props => props.selected ? '#FFFFFF': '#228b22'};
+`;

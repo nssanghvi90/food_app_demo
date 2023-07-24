@@ -57,7 +57,9 @@ const MenuScreen = ({navigation}) => {
 
   const goToCart = () => {
     // Check if any items are selected 
-    if(Object.keys(cartState.cart).length === 0){
+    const isCartEmpty = !Object.keys(cartState.cart).find(c => cartState.cart[c] > 0);
+
+    if(isCartEmpty){      
       alert('Please add an item to cart');
       return;
     }
